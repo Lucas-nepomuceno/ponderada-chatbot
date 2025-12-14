@@ -1,0 +1,21 @@
+# Bibliotecas essenciais para Processamento de Dados 
+numpy
+
+# Biblioteca necessária para a formatação de tabelas Markdown
+tabulate
+
+# Bibliotecas essenciais para Agentes de IA e RAG (Pessoa 3 / Lucas)
+pydantic>=2.0.0  # Usado para schemas JSON (Pessoa 3)
+python-dotenv    # Usado para carregar o arquivo .env (Pessoa 3)
+langchain        # Framework principal de Agentes (Pessoa 3)
+langchain-core   # Dependência do LangChain
+langchain-text-splitters # Usado para dividir emails em chunks (Pessoa 3)
+
+# Drivers de modelos e serviços (Conforme as necessidades do projeto)
+# Se estiver usando o modelo NVIDIA Nemotron Nano:
+# (Dependências específicas do driver de modelo NVIDIA, podem variar)
+# Se a instalação via LangChain for suficiente, não precisamos de mais nada.
+
+
+# Nova dependência para integrar modelos OpenAI-compatíveis (como a API NVIDIA)
+langchain-openai
