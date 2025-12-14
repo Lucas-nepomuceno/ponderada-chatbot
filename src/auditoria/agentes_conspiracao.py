@@ -3,8 +3,7 @@ from pydantic import BaseModel, Field
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
 from .utils.agentes import model, carregar_e_dividir_emails
-# Nota: A importação do modelo já estava correta.
-
+from typing import List
 
 class Conspiracao(BaseModel):
     conspiracao_verificada: bool = Field(description="True se houver evidências claras de conspiração de Michael Scott contra Toby Flenderson.")
