@@ -15,9 +15,7 @@ from langchain_core.agents import AgentFinish
 from langchain.agents.format_scratchpad import format_to_tool_calling
 from langchain.agents.output_parsers import ToolsAgentOutputParser
 
-# ----------------------------------------------------------------------------------
-# Importa o modelo LLM e utilitários
-from .utils_agentes import model, carregar_e_dividir_emails 
+from .utils.agentes import model, carregar_e_dividir_emails
 
 # Adiciona o caminho do projeto para encontrar o seu módulo auditor_rules
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))

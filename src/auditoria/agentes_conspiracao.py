@@ -2,7 +2,7 @@ import json
 from pydantic import BaseModel, Field
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
-from utils.agentes import model, carregar_e_dividir_emails # Adiciona carregar_e_dividir_emails aqui
+from .utils.agentes import model, carregar_e_dividir_emails
 # Nota: A importação do modelo já estava correta.
 
 
