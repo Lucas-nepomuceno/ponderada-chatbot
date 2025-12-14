@@ -14,21 +14,11 @@ model = init_chat_model(
     api_key=NVIDIA_API_KEY,
 )
 
-def include_header(text):
-    """Auxiliar que reanexa o cabeçalho (que geralmente é o [0] na lista) ao conteúdo subsequente."""
-    i = 0
-    chunks_com_header = [text[0]]
-    for i in range(1, len(text) - 1, 2):
-        chunk_com_header = text[i] + text[i+1]
-        chunks_com_header.append(chunk_com_header)
-    return chunks_com_header
-
 
 def create_chunks(text):
     """Separa o texto usando o delimitador estrutural."""
     
     chunks = text.split("-------------------------------------------------------------------------------")
-    chunks = include_header(chunks)
     return chunks
 
 
@@ -41,7 +31,7 @@ def carregar_e_dividir_emails(caminho="documents/emails.txt") -> List[Document]:
     except FileNotFoundError:
         print(f"ERRO: Arquivo {caminho} não encontrado.")
         return []
-    
+    content = content.replace('"', "'")
     custom_chunks = create_chunks(content) 
     print(f"E-mails separados em {len(custom_chunks)} blocos estruturais.")
 

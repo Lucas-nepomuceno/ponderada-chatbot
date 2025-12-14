@@ -1,7 +1,7 @@
 
-from .auditor_rules import executar_auditoria_simples, ferramenta_busca_transacao_id
-from .agentes_conspiracao import executar_agente_conspiracao
-from .agente_fraude_contextual import executar_agente_fraude_contextual
+from auditor_rules import executar_auditoria_simples, ferramenta_busca_transacao_id
+from agentes_conspiracao import executar_agente_conspiracao
+from agente_fraude_contextual import executar_agente_fraude_contextual
 
 
 def main():
