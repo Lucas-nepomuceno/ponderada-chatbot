@@ -49,7 +49,7 @@
 
 ### 1. Estrutura e Arquitetura do Módulo
 
-Toda a lógica oi encapsulada no pacote `src/auditoria` para garantir modularidade e evitar conflitos de dependências (como os erros de `ImportError` e `NameError` já resolvidos).
+Toda a lógica foi encapsulada no pacote `src/auditoria` para garantir modularidade e evitar conflitos de dependências (como os erros de `ImportError` e `NameError` já resolvidos).
 
 | Caminho | Tipo | Propósito |
 | :--- | :--- | :--- |
@@ -57,7 +57,6 @@ Toda a lógica oi encapsulada no pacote `src/auditoria` para garantir modularida
 | `src/auditoria/data_preparation.py` | Script | **Responsável pela entrada de dados (I/O).** Carrega o CSV, limpa, padroniza e garante IDs únicos. |
 | `src/auditoria/auditor_rules.py` | Script | **Responsável pela lógica de negócios.** Implementa as regras de compliance (Nível 3.1) e desenvolve as Tools. |
 | `src/auditoria/main_orchestrator.py` | Script | **Ponto de Execução e Teste.** Orquestra o fluxo de trabalho para validação e demonstração. |
-
 
 
 ---
@@ -100,19 +99,6 @@ A peça mais importante para a integração com a Cecilia é a Ferramanta de Ace
 
 O módulo `auditor_rules.py` também inclui a função **`detectar_smurfing()`** (fraude por estruturação) que será utilizada no Nível 3.2 para analisar padrões de gasto divididos pelo mesmo funcionário/fornecedor/data, antecipando a lógica de Fraude Contextual.
 
----
-
-### 4. Configurações Essenciais
-
-As credenciais do projeto estão centralizadas no arquivo **`.env`** na raiz do projeto.
-
-| Chave | Uso |
-| :--- | :--- |
-| `NVIDIA_API_KEY` | **Essencial** para inicializar o LLM (`Nemotron-Nano-9b-v2`) usado para o RAG e o Raciocínio dos Agentes. |
-| `QDRANT_URL`, `QDRANT_API_KEY` | Acesso ao Banco de Dados Vetorial onde os "chunks" da `politica_compliance.txt` estão armazenados. |
-
-**Instrução de Uso:** A Pessoa 3 deve usar a `NVIDIA_API_KEY` ao configurar o *runtime* do Agente, conforme as especificações de Lucas.
-
 ## Rodando a aplicação com Docker
 
 # Como rodar a aplicação
@@ -138,7 +124,7 @@ docker run -it --rm -v $(pwd):/usr/src/chatbot chatbot:latest /bin/bash
 
 ```bash
 
-python3 pip freeze > requirements.txt && \
+pip freeze > requirements.txt && \
 exit
 
 ```

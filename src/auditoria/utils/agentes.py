@@ -6,12 +6,9 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 load_dotenv()
 NVIDIA_API_KEY = os.getenv("NVIDIA_API_KEY")
 
-MODEL_NAME = "openai:nvidia/nvidia-nemotron-nano-9b-v2"
-BASE_URL = "https://integrate.api.nvidia.com/v1"
-
 model = init_chat_model(
-    MODEL_NAME,
-    base_url=BASE_URL,
+    "openai:nvidia/nvidia-nemotron-nano-9b-v2",
+    base_url="https://integrate.api.nvidia.com/v1",
     api_key=NVIDIA_API_KEY,
 )
 

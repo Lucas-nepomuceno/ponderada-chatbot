@@ -2,7 +2,7 @@ import json
 from pydantic import BaseModel, Field
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
-from .utils_agentes import model, carregar_e_dividir_emails # Adiciona carregar_e_dividir_emails aqui
+from utils.agentes import model, carregar_e_dividir_emails # Adiciona carregar_e_dividir_emails aqui
 # Nota: A importação do modelo já estava correta.
 
 
@@ -32,8 +32,8 @@ def extrair_evidencias_por_chunk(chunks):
         print(f"Processando chunk {i+1}/{len(chunks)}...")
         resultado = extraction_chain.invoke({"chunk_text": chunk.page_content})
         
-        if "NENHUMA EVIDÊNCIA" not in resultado.upper():
-            linhas_encontradas = [line.strip() for line in resultado.split('\n') if line.strip()]
+        if "NENHUMA EVIDÊNCIA" not in resultado.content:
+            linhas_encontradas = [line.strip() for line in resultado.content.split('\n') if line.strip()]
             todas_as_evidencias.extend(linhas_encontradas)
             
     return todas_as_evidencias
@@ -42,7 +42,7 @@ consolidation_prompt = ChatPromptTemplate.from_messages(
     [
         (
             "system",
-            "Você é o Agente de Auditoria de IA, responsável pela conclusão final. Você recebeu uma lista de possíveis evidências de conspiração. Analise a lista e preencha o JSON estritamente conforme o schema, respondendo em Português. Use as evidências fornecidas para a 'justificativa_final'.\n{format_instructions}"
+            "Você é o Agente de Auditoria de IA, responsável pela conclusão final. Você recebeu uma lista de possíveis evidências de conspiração. Analise a lista e preencha o JSON estritamente conforme o schema. RESPONDA SEMPRE EM PORTUGUÊS. Use as evidências fornecidas para a 'justificativa_final'.\n{format_instructions}"
         ),
         (
             "human",
