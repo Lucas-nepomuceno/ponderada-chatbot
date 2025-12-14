@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import json
 # Importa a função de carregamento/limpeza do módulo irmão (data_preparation)
-from data_preparation import carregar_e_limpar_transacoes 
+from auditoria.data_preparation import carregar_e_limpar_transacoes 
 
 # ==============================================================================
 # 0. INICIALIZAÇÃO DE VARIÁVEL GLOBAL E REGRAS

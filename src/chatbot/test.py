@@ -2,7 +2,7 @@ import os
 from langchain.chat_models import init_chat_model
 from dotenv import load_dotenv
 from langchain.tools import tool
-from rag.vector_store.qdrant_vector_store import VectorStore
+from chatbot.rag.vector_store.qdrant_vector_store import VectorStore
 from langchain.agents import create_agent
 
 load_dotenv()
