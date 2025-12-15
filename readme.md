@@ -1,4 +1,3 @@
-
 # Auditor de Compliance Dunder Mifflin (Agente Inteligente)
 
 Este repositório é a resposta do trio Cecília, Laura e Lucas do Instituto de Tecnologia e Liderança da T12-EC08 à ponderada "Desafio: A Auditoria do Toby".
@@ -9,8 +8,8 @@ O objetivo é desenvolver um **Agente Inteligente de Auditoria** para Toby Flend
 
 | Requisito | Status | Detalhamento |
 | :--- | :--- | :--- |
-| **Código Fonte em Python** |  Completo | Implementado no diretório `src/`. |
-| **README com Arquitetura e Instruções** |  Completo | Este documento detalha a arquitetura de Agentes, RAG e as ferramentas utilizadas. |
+| **Código Fonte em Python** | Completo | Implementado no diretório `src/`. |
+| **README com Arquitetura e Instruções** | Completo | Este documento detalha a arquitetura de Agentes, RAG e as ferramentas utilizadas. |
 | **Vídeo de Demonstração** | Completo | O sistema atende aos 3 requisitos (4 níveis de complexidade). |
 | **Uso de `.env`** | Completo | Chaves de API (e.g., `GEMINI_API_KEY`, `NVIDIA_API_KEY`) são carregadas via `.env`. |
 | **Framework de Orquestração** | Completo | Utilização de Agentes com acesso a **Tools/Functions** (baseado em LangChain/Google ADK ou similar). |
@@ -18,11 +17,6 @@ O objetivo é desenvolver um **Agente Inteligente de Auditoria** para Toby Flend
 ## 1\. Arquitetura do Agente de Auditoria
 
 A solução foi construída como um sistema de **Agentes Especializados** coordenados por um Agente Principal (**Toby's Auditor**). A chave da arquitetura é o uso de **Ferramentas (Tools)** que permitem ao Agente Orquestrador interagir com os diferentes *datasets* (TXT, CSV) de forma eficiente.
-
-<div align="center">
-  <img src="arquitetura_agentes.png" alt="Diagrama de Arquitetura do Agente de Auditoria Dunder Mifflin" style="max-width: 100%;">
-  <figcaption>Figura 1: Arquitetura de Agentes e Ferramentas para a Auditoria. Fonte: Os Autores.</figcaption>
-</div>
 
 ### Componentes Chave
 
@@ -37,23 +31,93 @@ A solução foi construída como um sistema de **Agentes Especializados** coorde
 
 ### 2.1. Nível 1: Chatbot de Compliance (RAG)
 
-O RAG (Retrieval-Augmented Generation) foi implementado para consumir o documento `politica_compliance.txt`.
+  O RAG (Retrieval Augmented-Generation) é feito a partir do seguinte fluxo: Load -\> Sanitizing -\> Chunking -\> Embedding & Storing. Essa seção do projeto está contemplada no arquivo `src/parte-1-rag/rag/rag_politica_complicance.py`. No entanto, todos os arquivos da pasta `src/parte-1-rag` contribuem para tal. Abaixo, explica-se como o RAG foi feito para o `politica_compliance.txt` em vias de criar um chatbot que responde dúvidas acerca da política da empresa.
 
-  * **Fluxo de Implementação:** *Load* $\rightarrow$ *Sanitizing* $\rightarrow$ **Chunking Semântico** $\rightarrow$ *Embedding* $\rightarrow$ *Storing*.
-  * **Chunking Estratégico:** Optou-se por um *chunking* manual/estrutural com base na separação de seções (`==...==`) do documento, garantindo que cada *chunk* contivesse uma regra completa, otimizando a precisão da recuperação (o que é superior ao *chunking* baseado apenas em tokens).
-  * **Vector Store:** Utilização do **Qdrant** para armazenamento vetorial e `gemini-embedding-001` para a criação dos embeddings.
-  * **Entrega:** O Agente RAG não apenas responde à pergunta, mas garante que a **política seja citada** (prova) para justificar a resposta.
+  Para começar o RAG, foi necessário carregar o `politica_compliance.txt`. Como o documento estava localmente conosco (na pasta `documents`), cumprir este passo foi simples: bastou carregá-lo em uma variável usando as funções `open()` e `read()` nativas do Python.
 
-### 2.2. Nível 3.1: Detecção de Fraudes por Regras Diretas
+  Em seguida, criou-se os chunks. Primeiro, pensou-se em utilizar a biblioteca **LangChain** para quebrar o texto com base no número de tokens. No entanto, como o documento é semanticamente estruturado em seções, optou-se por um *chunking* manual. Para tanto, definimos e utilizamos a função `create_chunks()` e sua auxiliar `include_header()`. Essas, em conjunto, quebram o texto com base na separação que o próprio faz de suas seções, utilizando o "==...==" para iniciá-las e terminá-las. Ao final, utilizou-se a **LangChain** para deixar os *chunks* em formato adequado para passarem pelo embedding (função `create_documents`).
 
-Este nível foca na verificação de violações de *compliance* que são evidentes apenas pela análise do `transacoes_bancarias.csv`, sem necessidade de contexto de comunicação.
+  Por último, fez-se o *embedding* e *storing* dos *chunks*. Para tanto, usou-se o modelo de embedding `gemini-embedding-001` e a Vector Store do Qdrant. Isso está mais claramente definido no arquivo `qdrant_vector_store.py` dentro de `src/parte-1-rag/rag/vector_store`, onde definimos a classe VectorStore, inicializando o cliente e a coleção "ponderada-parte-1" no Qdrant com o embedding supracitado. Essa classe também disponibiliza os métodos `add_documents` e `similarity_search` do QdrantVectorStore. Então, no arquivo `rag_politica_compliance.py`, carregamos os chunks na Qdrant usando `add_documents`.
 
-  * **Módulo:** `src/auditoria/auditor_rules.py`.
-  * **Tool:** O Agente utiliza a função `executar_auditoria_simples()` que aplica as seguintes regras extraídas da política:
-      * **R001 (Limite de Gasto):** Transações acima de **$500.00** exigem aprovação de CFO.
-      * **R003 (Local Restrito):** Gasto em locais explicitamente proibidos (e.g., "Hooters").
-      * **R004 (Itens Proibidos):** Compras de itens não reembolsáveis ou proibidos (e.g., "algemas", "espada").
-  * **Resultado:** Geração de um DataFrame com todas as transações violadas e o código da regra (`R001`, `R003`, etc.) como justificativa.
+  Abaixo, pode-se verificar o grafo pelo embedding.
+
+<div style="align: center;">
+<sup>Figura 1: Grafo com nós de chunks</sup>
+
+![Grafo com todos os chunks](image.png)
+
+<sub>Fonte: os autores</sub>
+
+</div>
+
+&emsp; Em `src/parte-1-rag/test.py`, inicializa-se um agente da NVIDIA com acesso a essa tool que responde dúvidas do cliente no terminal, enquanto mantém o histórico da conversa.
+
+<div style="align: center;">
+<sup>Figura 1: Grafo com nós de chunks</sup>
+
+![Teste do chat com RAG consumindo a politica_compliance.txt](image-1.png)
+
+<sub>Fonte: os autores</sub>
+</div>
+
+### 2.2. Módulo de Auditoria e Dados
+
+Preparação e Limpeza de Dados, Detecção de Fraudes por Regras (Nível 3.1) e Desenvolvimento de Ferramentas (Tools) para Agentes de IA.
+
+-----
+
+#### 1\. Estrutura e Arquitetura do Módulo
+
+Toda a lógica foi encapsulada no pacote `src/auditoria` para garantir modularidade e evitar conflitos de dependências (como os erros de `ImportError` e `NameError` já resolvidos).
+
+| Caminho | Tipo | Propósito |
+| :--- | :--- | :--- |
+| `src/auditoria/` | **Pacote** | Contém toda a lógica de dados e regras. |
+| `src/auditoria/data_preparation.py` | Script | **Responsável pela entrada de dados (I/O).** Carrega o CSV, limpa, padroniza e garante IDs únicos. |
+| `src/auditoria/auditor_rules.py` | Script | **Responsável pela lógica de negócios.** Implementa as regras de compliance (Nível 3.1) e desenvolve as Tools. |
+| `src/auditoria/main_orchestrator.py` | Script | **Ponto de Execução e Teste.** Orquestra o fluxo de trabalho para validação e demonstração. |
+
+-----
+
+#### 2\. Nível de Entrega: Detecção de Fraudes (Nível 3.1)
+
+O módulo implementa o primeiro nível de detecção, focado em violações diretas da política de compliance (`politica_compliance.txt`).
+
+##### 2.1. Função Principal de Validação
+
+| Função | Descrição |
+| :--- | :--- |
+| `executar_auditoria_simples()` | Função mestra que gerencia o fluxo de trabalho: carrega os dados brutos, limpa-os e aplica todas as regras de compliance, retornando um DataFrame apenas com as transações violadas e suas justificativas. |
+
+##### 2.2. Regras Implementadas (Extraídas da Política)
+
+As seguintes regras são verificadas linha por linha no DataFrame:
+
+| ID da Regra | Tipo | Condição | Ação |
+| :--- | :--- | :--- | :--- |
+| **R001\_LIMITE\_ALTO** | Limite de Gasto | `valor` \> $500.00 | Sinaliza transações que exigem aprovação do CFO. |
+| **R003\_RESTRITO\_LOCAL** | Gasto Proibido | `descricao` contém "Hooters" | Viola a política de locais de reembolso. |
+| **R004\_PROIBIDO\_ITENS** | Itens Proibidos | `descricao` contém palavras-chave (ex: "algemas", "espada", "frigobar", "spa") | Sinaliza compras estritamente proibidas ou não reembolsáveis. |
+
+-----
+
+#### 3\. Entregas Críticas para o Agente de IA (Pessoa 3)
+
+A peça mais importante para a integração com a Cecilia é a Ferramanta de Acesso aos dados.
+
+##### 3.1. Ferramenta de Busca de Transação (Tool)
+
+| Função | Finalidade | Módulo |
+| :--- | :--- | :--- |
+| `ferramenta_busca_transacao_id(id_transacao)` | Permite que o **Agente de IA** (LLM) pesquise qualquer ID de transação mencionado em um e-mail. Retorna todos os detalhes da transação em formato **JSON**. | `auditor_rules.py` |
+
+**Integração:** A Tool utiliza a variável global interna (`df_transacoes_global`) que é preenchida por `executar_auditoria_simples()`. Isso permite que a Tool seja chamada pelo Agente (que só passa o ID) e ainda acesse o DataFrame limpo.
+
+##### 3.2. Estrutura de Dados (Nível 3.2)
+
+O módulo `auditor_rules.py` também inclui a função **`detectar_smurfing()`** (fraude por estruturação) que será utilizada no Nível 3.2 para analisar padrões de gasto divididos pelo mesmo funcionário/fornecedor/data, antecipando a lógica de Fraude Contextual.
+
+-----
 
 ### 2.3. Nível 2 e Nível 3.2: Conspiração e Fraude Contextual
 
@@ -74,7 +138,7 @@ Estes níveis representam a maior complexidade, exigindo que o Agente Orquestrad
 
 -----
 
-## 3\.  Como Rodar a Aplicação (Instruções)
+## 3\. Como Rodar a Aplicação (Instruções)
 
 ### Pré-requisitos
 
@@ -90,7 +154,7 @@ Estes níveis representam a maior complexidade, exigindo que o Agente Orquestrad
     cd PONDERADA-CHATBOT
     ```
 
-2.  Pegue o arquivo .env que enviaremos a parte!
+2.  Pegue o arquivo .env que enviaremos a parte\!
 
 ### 3.2. Rodando com Docker (Recomendado)
 
@@ -109,36 +173,59 @@ O uso do Docker garante que todas as dependências do `requirements.txt` e o amb
     docker run -it --rm -v $(pwd):/usr/src/chatbot chatbot:latest /bin/bash
     ```
 
-3.  **Execução dos Módulos (Dentro do Contêiner):**
+3.  **Finalização de Setup (opcional):**
+    Após as alterações, rode o comando:
 
-      * **Nível 1 (RAG Chatbot):**
-        ```bash
-        python src/parte-1-rag/test.py
-        ```
-      * **Nível 3.1 (Auditoria Simples):**
-        ```bash
-        python src/auditoria/main_orchestrator.py
-        ```
-      * **Nível 2 e 3.2 (Agente Orquestrador Completo):**
-        (Assumindo que o Agente Principal está aqui, conforme sua implementação final)
-        ```bash
-        python src/main_agent.py
-        ```
+    ```bash
+    pip freeze > requirements.txt && \
+    exit
+    ```
 
-### 3.3. Instalação Local (Alternativa)
+## 4\. Interface de Linha de Comando (CLI)
 
-Se preferir rodar localmente (não recomendado, devido à arguição):
+O projeto é acessado e demonstrado através de uma interface de console unificada, que atua como um *router* para as diversas funcionalidades de Auditoria e RAG (Retrieval Augmented Generation).
 
-1.  Crie e ative um ambiente virtual.
-2.  Instale as dependências: `pip install -r requirements.txt`.
-3.  Execute os *scripts* na ordem desejada.
+### 4.1. Como Acessar a CLI
 
------
+A CLI é executada pelo script `main.py` na raiz do projeto (após garantir que o ambiente Docker está ativo e o volume está montado).
 
-## 4\. Material Complementar
+```bash
+# Se estiver no terminal do container Docker:
+python main.py
+```
 
-  * `data/politica_compliance.txt`: Regras para o RAG.
-  * `data/transacoes_bancarias.csv`: Dados para análise estruturada (Nível 3.1 e 3.2).
-  * `data/emails_internos.txt`: Dados para análise não estruturada (Nível 2 e 3.2).
+### 4.2. Fluxo de Navegação e Funcionalidades
+
+O sistema inicia perguntando a identidade do usuário e, com base nela, libera diferentes níveis de acesso e ferramentas de Auditoria.
+
+#### Rota A: Usuário Não-Toby (Consulta de Compliance)
+
+Acesso para qualquer funcionário que precise de orientação sobre a política da empresa.
+
+| Opção | Ação | Módulo Acionado | Finalidade |
+| :--- | :--- | :--- | :--- |
+| **2** | Sou outro funcionário e quero saber sobre a política de compliance | `start_chat()` | Inicia um chatbot interativo que consulta a `politica_compliance.txt` usando o RAG para responder a dúvidas. |
+
+#### Rota B: Usuário Autenticado (Toby Flenderson)
+
+O acesso às ferramentas de auditoria e verificação de fraude é restrito a Toby, o Auditor de RH, mediante autenticação de senha (lida do arquivo `.env`).
+
+Após a autenticação, as seguintes opções se tornam disponíveis:
+
+| Opção | Ação | Módulo Acionado | Finalidade |
+| :--- | :--- | :--- | :--- |
+| **1** | Desejo realizar uma auditoria simples | `executar_auditoria_simples()` | Executa a **Auditoria Nível 3.1**, verificando o `transacoes_bancarias.csv` contra regras diretas (limites de valor, itens proibidos). |
+| **2** | Desejo realizar um auditoria de fraude contextual | `executar_agente_fraude_contextual()` | Executa o **Agente de Fraude Contextual (Nível 3.2)**, que analisa e-mails em busca de contexto e usa a Tool de busca de transação para validar a fraude. |
+| **3** | Desejo verificar o chat | `start_chat()` | Permite que Toby acesse o mesmo chatbot de consulta de compliance. |
+
+### 4.3. Estrutura de Autenticação
+
+A segurança da CLI é implementada carregando a chave `SENHA` do arquivo `.env`. O acesso às funcionalidades de auditoria é totalmente dependente dessa variável.
+
+## 5\. Material Complementar
+
+  * `documents/politica_compliance.txt`: Regras para o RAG.
+  * `documents/transacoes_bancarias.csv`: Dados para análise estruturada (Nível 3.1 e 3.2).
+  * `documents/emails_internos.txt`: Dados para análise não estruturada (Nível 2 e 3.2).
   * `src/parte-1-rag/`: Implementação do RAG com Qdrant.
   * `src/auditoria/`: Módulo de preparação de dados e regras de *compliance* (Tools).
