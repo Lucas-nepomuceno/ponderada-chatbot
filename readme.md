@@ -25,7 +25,7 @@ A solução foi construída como um sistema de **Agentes Especializados** coorde
 | **Agente Orquestrador** | LLM (Gemini/NVIDIA NIM) | Interpreta a intenção do usuário e decide qual Tool ou Agente acionar (RAG, Busca em E-mail, Análise CSV). | Todos |
 | **Agente RAG (Nível 1)** | Qdrant, `gemini-embedding-001` | Responde a consultas sobre a `politica_compliance.txt`, fornecendo citações como evidência. | Nível 1 |
 | **Ferramenta de Análise CSV** | Pandas, Pydantic | Ferramenta que expõe funções como `ferramenta_busca_transacao_id(id)` e `executar_auditoria_simples()` ao Agente. | Nível 3.1, 3.2 |
-| **Ferramenta de Busca em E-mail** | Python Nativo (Regex/String) | Permite buscar por termos e padrões no `emails_internos.txt` para contextualização e conspiração. | Nível 2, 3.2 |
+| **Ferramenta de Busca em E-mail** | Python Nativo (Regex/String) | Permite buscar por termos e padrões no `emails.txt` para contextualização e conspiração. | Nível 2, 3.2 |
 
 ## 2\. Implementação por Nível de Desafio
 
@@ -121,7 +121,7 @@ O módulo `auditor_rules.py` também inclui a função **`detectar_smurfing()`**
 
 ### 2.3. Nível 2 e Nível 3.2: Conspiração e Fraude Contextual
 
-Estes níveis representam a maior complexidade, exigindo que o Agente Orquestrador cruze informações não estruturadas (`emails_internos.txt`) com dados estruturados (`transacoes_bancarias.csv`).
+Estes níveis representam a maior complexidade, exigindo que o Agente Orquestrador cruze informações não estruturadas (`emails.txt`) com dados estruturados (`transacoes_bancarias.csv`).
 
 #### A. Verificação de Conspiração (Nível 2)
 
@@ -226,6 +226,6 @@ A segurança da CLI é implementada carregando a chave `SENHA` do arquivo `.env`
 
   * `documents/politica_compliance.txt`: Regras para o RAG.
   * `documents/transacoes_bancarias.csv`: Dados para análise estruturada (Nível 3.1 e 3.2).
-  * `documents/emails_internos.txt`: Dados para análise não estruturada (Nível 2 e 3.2).
+  * `documents/emails.txt`: Dados para análise não estruturada (Nível 2 e 3.2).
   * `src/parte-1-rag/`: Implementação do RAG com Qdrant.
   * `src/auditoria/`: Módulo de preparação de dados e regras de *compliance* (Tools).
