@@ -244,9 +244,6 @@ Após a autenticação, o menu interno da Auditoria é exibido:
 
 A segurança da CLI é implementada carregando a chave `SENHA` do arquivo `.env`. O acesso às funcionalidades de auditoria é totalmente dependente dessa variável.
 
-```
-```
-
 ## 5\. Material Complementar
 
   * `documents/politica_compliance.txt`: Regras para o RAG.
