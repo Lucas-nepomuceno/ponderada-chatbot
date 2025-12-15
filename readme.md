@@ -68,7 +68,7 @@ Preparação e Limpeza de Dados, Detecção de Fraudes por Regras (Nível 3.1) e
 
 #### 1\. Estrutura e Arquitetura do Módulo
 
-Toda a lógica foi encapsulada no pacote `src/auditoria` para garantir modularidade e evitar conflitos de dependências (como os erros de `ImportError` e `NameError` já resolvidos).
+Toda a lógica foi encapsulada no pacote `src/auditoria` para garantir modularidade e evitar conflitos de dependências.
 
 | Caminho | Tipo | Propósito |
 | :--- | :--- | :--- |
