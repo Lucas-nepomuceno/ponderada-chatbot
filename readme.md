@@ -103,7 +103,7 @@ As seguintes regras são verificadas linha por linha no DataFrame:
 
 #### 3\. Entregas Críticas para o Agente de IA (Pessoa 3)
 
-A peça mais importante para a integração com a Cecilia é a Ferramanta de Acesso aos dados.
+A peça mais importante para a integração com a Cecilia é a Ferramenta de Acesso aos dados.
 
 ##### 3.1. Ferramenta de Busca de Transação (Tool)
 
