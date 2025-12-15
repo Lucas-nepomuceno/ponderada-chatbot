@@ -18,6 +18,15 @@ O objetivo é desenvolver um **Agente Inteligente de Auditoria** para Toby Flend
 
 A solução foi construída como um sistema de **Agentes Especializados** coordenados por um Agente Principal (**Toby's Auditor**). A chave da arquitetura é o uso de **Ferramentas (Tools)** que permitem ao Agente Orquestrador interagir com os diferentes *datasets* (TXT, CSV) de forma eficiente.
 
+<div style="align: center;">
+<sup>Figura 1: Diagrama de arquitetura</sup>
+
+![Diagrama de arquitetura](arquitetura.png)
+
+<sub>Fonte: os autores</sub>
+
+</div>
+
 ### Componentes Chave
 
 | Componente | Framework/Tecnologia | Função | Níveis Atendidos |
