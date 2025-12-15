@@ -180,47 +180,63 @@ O uso do Docker garante que todas as dependências do `requirements.txt` e o amb
     pip freeze > requirements.txt && \
     exit
     ```
+Aqui está a documentação da CLI (Interface de Linha de Comando) para o seu `README.md`, refletindo a estrutura atualizada do seu `main.py` com o menu interativo para Toby:
 
-## 4\. Interface de Linha de Comando (CLI)
+
+## 4. Interface de Linha de Comando (CLI)
 
 O projeto é acessado e demonstrado através de uma interface de console unificada, que atua como um *router* para as diversas funcionalidades de Auditoria e RAG (Retrieval Augmented Generation).
 
 ### 4.1. Como Acessar a CLI
 
-A CLI é executada pelo script `main.py` na raiz do projeto (após garantir que o ambiente Docker está ativo e o volume está montado).
+A CLI é executada pelo script `main.py` (ou `main`) na raiz do projeto.
 
 ```bash
 # Se estiver no terminal do container Docker:
 python main.py
+````
+
+O sistema inicia perguntando a identidade do usuário em um menu contínuo:
+
+```
+Bem vindo a IA da Dunder Mifflin
+Escolha uma das três opções a seguir, colocando o número correto
+1 - Sou Toby Flenderson
+2 - Sou outro funcionário e quero saber sobre a política de compliance
+3 - Sair
 ```
 
 ### 4.2. Fluxo de Navegação e Funcionalidades
 
-O sistema inicia perguntando a identidade do usuário e, com base nela, libera diferentes níveis de acesso e ferramentas de Auditoria.
-
-#### Rota A: Usuário Não-Toby (Consulta de Compliance)
+#### Rota A: Usuário Não-Auditor (Consulta de Compliance)
 
 Acesso para qualquer funcionário que precise de orientação sobre a política da empresa.
 
 | Opção | Ação | Módulo Acionado | Finalidade |
 | :--- | :--- | :--- | :--- |
 | **2** | Sou outro funcionário e quero saber sobre a política de compliance | `start_chat()` | Inicia um chatbot interativo que consulta a `politica_compliance.txt` usando o RAG para responder a dúvidas. |
+| **3** | Sair | Encerra o programa. | |
 
 #### Rota B: Usuário Autenticado (Toby Flenderson)
 
-O acesso às ferramentas de auditoria e verificação de fraude é restrito a Toby, o Auditor de RH, mediante autenticação de senha (lida do arquivo `.env`).
+O acesso é restrito ao Auditor de RH mediante autenticação de senha (lida do arquivo `.env`). Se a senha estiver incorreta, o sistema impede o acesso.
 
-Após a autenticação, as seguintes opções se tornam disponíveis:
+Após a autenticação, o menu interno da Auditoria é exibido:
 
 | Opção | Ação | Módulo Acionado | Finalidade |
 | :--- | :--- | :--- | :--- |
 | **1** | Desejo realizar uma auditoria simples | `executar_auditoria_simples()` | Executa a **Auditoria Nível 3.1**, verificando o `transacoes_bancarias.csv` contra regras diretas (limites de valor, itens proibidos). |
 | **2** | Desejo realizar um auditoria de fraude contextual | `executar_agente_fraude_contextual()` | Executa o **Agente de Fraude Contextual (Nível 3.2)**, que analisa e-mails em busca de contexto e usa a Tool de busca de transação para validar a fraude. |
-| **3** | Desejo verificar o chat | `start_chat()` | Permite que Toby acesse o mesmo chatbot de consulta de compliance. |
+| **3** | Desejo ver se Michael está conspirando contra mim | `executar_agente_conspiracao()` | Executa o **Sistema de Verificação de Conspiração (Nível 2)**, vasculhando o *dump* de e-mails para encontrar evidências de má conduta. |
+| **4** | Desejo verificar o chat | `start_chat()` | Permite que Toby acesse o chatbot de consulta de compliance. |
+| **5** | Sair | Retorna ao menu principal. | |
 
 ### 4.3. Estrutura de Autenticação
 
 A segurança da CLI é implementada carregando a chave `SENHA` do arquivo `.env`. O acesso às funcionalidades de auditoria é totalmente dependente dessa variável.
+
+```
+```
 
 ## 5\. Material Complementar
 
